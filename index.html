@@ -35,7 +35,7 @@
 </header>
 
 <div class="search-container">
-    <input type="text" id="searchInput" placeholder="🔍 ស្វែងរកពាក្យ..." onkeyup="searchWord()">
+<input type="text" id="searchInput" placeholder="ស្វែងរកពាក្យ..." onkeyup="searchWord()">
 </div>
 
 <div class="tab-bar">
@@ -224,12 +224,9 @@ document.addEventListener('click', function() {
         { km: "រសជាតិ", en: "Taste", fr: "Goût", zh: "口味" },
         { km: "អារម្មណ៍", en: "Feeling", fr: "Sentiment", zh: "情绪" },
         { km: "ជីវិត", en: "Life", fr: "Vie", zh: "生活" }
-         // ចំណុចនេះ អ្នកអាចចម្លងពាក្យពី Excel មកដាក់បន្តបានយ៉ាងងាយ
     ];
-
     let currentLang = 'km';
 
-    function render(lang) {
         currentLang = lang;
         const container = document.getElementById('wordList');
         container.innerHTML = "";
