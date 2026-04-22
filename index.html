@@ -132,21 +132,32 @@
         document.getElementById('message').innerText = "";
     }
 
-    function check() {
-        let val = document.getElementById('userInput').value.trim().toLowerCase();
-        let msg = document.getElementById('message');
-        if (val === current.a.toLowerCase()) {
+        function check() {
+        const userValue = document.getElementById('userInput').value.trim().toLowerCase();
+        const msg = document.getElementById('message');
+
+        if (userValue === currentWord.a.toLowerCase()) {
             score += 10;
             document.getElementById('score').innerText = score;
-            msg.innerText = "✅ ត្រឹមត្រូវ!";
-            msg.style.color = "green";
-            setTimeout(next, 800);
-        } else {
-            msg.innerText = "❌ ព្យាយាមម្ដងទៀត";
-            msg.style.color = "red";
-        }
-    }
+            msg.innerText = "🎉 ត្រឹមត្រូវ!";
+            msg.style.color = "#2ecc71";
 
+            // --- ផ្នែកបន្ថែមថ្មី៖ បញ្ជាឱ្យអានសំឡេងពាក្យដែលត្រឹមត្រូវ ---
+            window.speechSynthesis.cancel(); // ឈប់អានសំឡេងចាស់
+            let speech = new SpeechSynthesisUtterance(currentWord.a);
+            
+            // កំណត់ភាសាឱ្យអានត្រូវ (បើពាក្យមានសញ្ញា (FR) ឱ្យអានជាបារាំង បើមិនមែនឱ្យអានអង់គ្លេស)
+            speech.lang = currentWord.q.includes("(FR)") ? "fr-FR" : "en-US";
+            window.speechSynthesis.speak(speech);
+            // ----------------------------------------------------
+
+            setTimeout(nextWord, 1500); // ពន្យារពេលបន្តិចដើម្បីឱ្យអានចប់ចាំប្តូរពាក្យ
+        } else {
+            msg.innerText = "❌ មិនទាន់ត្រូវទេ ព្យាយាមម្ដងទៀត!";
+            msg.style.color = "#e74c3c";
+    }
+}
+    
     document.getElementById('userInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') check();
     });
