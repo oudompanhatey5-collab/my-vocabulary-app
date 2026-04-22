@@ -1,70 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ហ្គេមទាយពាក្យ</title>
+    <title>ហ្គេមទាយពាក្យ ១៥០</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: #eef2f3; }
-        .box { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        input { width: 80%; padding: 12px; margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 18px; text-align: center; }
-        button { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 16px; cursor: pointer; }
-        #msg { margin-top: 15px; font-weight: bold; }
-        .score { font-size: 20px; color: #007bff; margin-bottom: 10px; }
+        body { font-family: 'Khmer OS Siemreap', sans-serif; background: #667eea; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .game-container { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        .score-box { font-size: 20px; font-weight: bold; color: #6c5ce7; margin-bottom: 20px; }
+        #word-display { font-size: 40px; color: #d63031; margin: 20px 0; font-weight: bold; }
+        input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 20px; text-align: center; outline: none; box-sizing: border-box; }
+        button { background: #6c5ce7; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: bold; }
+        #message { margin-top: 15px; font-weight: bold; min-height: 25px; }
+        .footer { margin-top: 20px; font-size: 12px; color: #aaa; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h2>ហ្គេមទាយពាក្យ 🧠</h2>
-        <div class="score">ពិន្ទុ៖ <span id="score">0</span></div>
-        <p>តើពាក្យនេះជាភាសាអង់គ្លេសសរសេរដូចម្តេច?</p>
-        <h1 id="khmerWord" style="color: #d9534f;">...</h1>
-        
-        <input type="text" id="userInput" placeholder="វាយចម្លើយនៅទីនេះ..." autocomplete="off">
-        <br>
-        <button onclick="check()">បញ្ជូនចម្លើយ</button>
-        <div id="msg"></div>
-    </div>
+<div class="game-container">
+    <div class="score-box">ពិន្ទុ៖ <span id="score">0</span></div>
+    <div style="color: #636e72;">តើពាក្យនេះជាភាសាអង់គ្លេសអ្វី?</div>
+    <div id="word-display">...</div>
+    <input type="text" id="userInput" placeholder="វាយចម្លើយ..." autocomplete="off">
+    <button onclick="check()">បញ្ជូន</button>
+    <div id="message"></div>
+    <div class="footer">អភិវឌ្ឍដោយ៖ <strong>Tey OudomPanha</strong></div>
+</div>
 
-    <script>
-        const quizData = [
-            { km: "សួស្តី", en: "hello" },
-            { km: "សាលារៀន", en: "school" },
-            { km: "មិត្តភក្តិ", en: "friend" },
-            { km: "សៀវភៅ", en: "book" },
-            { km: "គ្រូ", en: "teacher" }
-        ];
+<script>
+    
+    const wordBank = [
+        { q: "ពន្លឺ", a: "light" }, { q: "ទន្លេ", a: "river" }, { q: "មេឃ", a: "sky" }, { q: "ផ្កាយ", a: "star" },
+        { q: "សួន", a: "garden" }, { q: "បណ្ណាល័យ", a: "library" }, { q: "សៀវភៅ", a: "book" }, { q: "តារាង", a: "table" },
+        { q: "បង្អួច", a: "window" }, { q: "ទ្វារ", a: "door" }, { q: "កៅអី", a: "chair" }, { q: "តុ", a: "table" },
+        { q: "សាលារៀន", a: "school" }, { q: "គ្រូ", a: "teacher" }, { q: "សិស្ស", a: "student" }, { q: "ប្រឡង", a: "exam" },
+        { q: "ការងារ", a: "work" }, { q: "គំនិត", a: "idea" }, { q: "សុបិន", a: "dream" }, { q: "អនាគត", a: "future" },
+        { q: "ភាពជោគជ័យ", a: "success" }, { q: "កម្លាំង", a: "strength" }, { q: "សេចក្ដីសង្ឃឹម", a: "hope" },
+        { q: "ការខិតខំ", a: "effort" }, { q: "ព្រឹក", a: "morning" }, { q: "ល្ងាច", a: "evening" }, { q: "កណ្ដាលថ្ងៃ", a: "noon" },
+        { q: "ភ្លៀង", a: "rain" }, { q: "ខ្យល់", a: "wind" }, { q: "ពពក", a: "cloud" }, { q: "សមុទ្រ", a: "ocean" },
+        { q: "ភ្នំ", a: "mountain" }, { q: "ព្រៃ", a: "forest" }, { q: "ផ្លូវ", a: "road" }, { q: "ស្ពាន", a: "bridge" },
+        { q: "ទីក្រុង", a: "city" }, { q: "ភូមិ", a: "village" }, { q: "ផ្សារ", a: "market" }, { q: "ហាង", a: "shop" },
+        { q: "ភោជនីយដ្ឋាន", a: "restaurant" }, { q: "ផ្លែឈើ", a: "fruit" }, { q: "បន្លែ", a: "vegetable" },
+        { q: "សាច់មាន់", a: "chicken" }, { q: "ត្រី", a: "fish" }, { q: "ស៊ុប", a: "soup" }, { q: "បាយ", a: "rice" },
+        { q: "ទឹក", a: "water" }, { q: "ទឹកកក", a: "ice" }, { q: "កាហ្វេ", a: "coffee" }, { q: "តែ", a: "tea" },
+        { q: "ទូរស័ព្ទ", a: "phone" }, { q: "កុំព្យូទ័រ", a: "computer" }, { q: "កាស", a: "headphone" }, { q: "កាមេរ៉ា", a: "camera" },
+        { q: "អេក្រង់", a: "screen" }, { q: "ប៊ូតុង", a: "button" }, { q: "អ៊ីនធឺណិត", a: "internet" }, { q: "កម្មវិធី", a: "app" },
+        { q: "គណនី", a: "account" }, { q: "លេខសម្ងាត់", a: "password" }, { q: "មិត្ត", a: "friend" }, { q: "គ្រួសារ", a: "family" },
+        { q: "បងប្អូន", a: "siblings" }, { q: "ឪពុក", a: "father" }, { q: "ម្ដាយ", a: "mother" }, { q: "កូន", a: "child" },
+        { q: "ជីដូន", a: "grandmother" }, { q: "ជីតា", a: "grandfather" }, { q: "ស្នាមញញឹម", a: "smile" },
+        { q: "សេចក្ដីស្រឡាញ់", a: "love" }, { q: "ការគោរព", a: "respect" }, { q: "ការជួយ", a: "help" },
+        { q: "ភាពស្មោះត្រង់", a: "honesty" }, { q: "សុភមង្គល", a: "happiness" }, { q: "ភាពស្ងប់ស្ងាត់", a: "calm" },
+        { q: "សម្លេង", a: "sound" }, { q: "តន្ត្រី", a: "music" }, { q: "ចម្រៀង", a: "song" }, { q: "រូបភាព", a: "image" },
+        { q: "ភាពយន្ត", a: "movie" }, { q: "តួអង្គ", a: "character" }, { q: "រឿងរ៉ាវ", a: "story" }, { q: "ប្រវត្តិសាស្ត្រ", a: "history" },
+        { q: "វប្បធម៌", a: "culture" }, { q: "ប្រទេស", a: "country" }, { q: "ភាសា", a: "language" }, { q: "អក្សរ", a: "letter" },
+        { q: "ពាក្យ", a: "word" }, { q: "ប្រយោគ", a: "sentence" }, { q: "សំណួរ", a: "question" }, { q: "ចម្លើយ", a: "answer" },
+        { q: "កំហុស", a: "mistake" }, { q: "ដំណោះស្រាយ", a: "solution" }, { q: "ការសម្រេចចិត្ត", a: "decision" },
+        { q: "ឱកាស", a: "opportunity" }, { q: "បញ្ហា", a: "problem" }, { q: "សុខភាព", a: "health" }, { q: "លំហាត់ប្រាណ", a: "exercise" },
+        { q: "កីឡា", a: "sport" }, { q: "បាល់ទាត់", a: "football" }, { q: "បាល់បោះ", a: "basketball" }, { q: "រត់", a: "run" },
+        { q: "ជិះកង់", a: "cycling" }, { q: "ហែលទឹក", a: "swimming" }, { q: "ស្បែកជើង", a: "shoes" }, { q: "អាវ", a: "shirt" },
+        { q: "ខោ", a: "pants" }, { q: "មួក", a: "hat" }, { q: "កាបូប", a: "bag" }, { q: "នាឡិកា", a: "watch" },
+        { q: "ចិញ្ចៀន", a: "ring" }, { q: "ខ្សែក", a: "necklace" }, { q: "សាប៊ូ", a: "soap" }, { q: "កន្សែង", a: "towel" },
+        { q: "ខ្នើយ", a: "pillow" }, { q: "គ្រែ", a: "bed" }, { q: "បន្ទប់", a: "room" }, { q: "ផ្ទះបាយ", a: "kitchen" },
+        { q: "បង្គន់", a: "toilet" }, { q: "សួនច្បារ", a: "garden" }, { q: "អំពូល", a: "bulb" }, { q: "កង្ហារ", a: "fan" },
+        { q: "ម៉ាស៊ីនត្រជាក់", a: "ac" }, { q: "រថយន្ត", a: "car" }, { q: "ម៉ូតូ", a: "motorbike" }, { q: "កង់", a: "bicycle" },
+        { q: "យន្តហោះ", a: "airplane" }, { q: "នាវា", a: "ship" }, { q: "សំបុត្រ", a: "ticket" }, { q: "ដំណើរ", a: "journey" },
+        { q: "ថ្ងៃឈប់សម្រាក", a: "holiday" }, { q: "ពិធីបុណ្យ", a: "festival" }, { q: "អំណោយ", a: "gift" },
+        { q: "ការភ្ញាក់ផ្អើល", a: "surprise" }, { q: "ភាពក្លាហាន", a: "courage" }, { q: "ការទទួលខុសត្រូវ", a: "responsibility" },
+        { q: "ភាពអត់ធ្មត់", a: "patience" }, { q: "ការចងចាំ", a: "memory" }, { q: "ភាពច្នៃប្រឌិត", a: "creativity" },
+        { q: "ការអប់រំ", a: "education" }, { q: "វិទ្យាសាស្ត្រ", a: "science" }, { q: "គណិតវិទ្យា", a: "math" },
+        { q: "បច្ចេកវិទ្យា", a: "tech" }, { q: "សិល្បៈ", a: "art" }, { q: "គំនូរ", a: "drawing" }, { q: "ពណ៌", a: "color" },
+        { q: "ក្លិន", a: "smell" }, { q: "រសជាតិ", a: "taste" }, { q: "អារម្មណ៍", a: "feeling" }, { q: "ជីវិត", a: "life" }
+    ];
 
-        let currentIndex = 0;
-        let score = 0;
+    let score = 0;
+    let current;
 
-        function loadQuiz() {
-            document.getElementById('khmerWord').innerText = quizData[currentIndex].km;
-            document.getElementById('userInput').value = "";
-            document.getElementById('msg').innerText = "";
+    function next() {
+        current = wordBank[Math.floor(Math.random() * wordBank.length)];
+        document.getElementById('word-display').innerText = current.q;
+        document.getElementById('userInput').value = "";
+        document.getElementById('message').innerText = "";
+    }
+
+    function check() {
+        let val = document.getElementById('userInput').value.trim().toLowerCase();
+        let msg = document.getElementById('message');
+        if (val === current.a.toLowerCase()) {
+            score += 10;
+            document.getElementById('score').innerText = score;
+            msg.innerText = "✅ ត្រឹមត្រូវ!";
+            msg.style.color = "green";
+            setTimeout(next, 800);
+        } else {
+            msg.innerText = "❌ ព្យាយាមម្ដងទៀត";
+            msg.style.color = "red";
         }
+    }
 
-        function check() {
-            let answer = document.getElementById('userInput').value.trim().toLowerCase();
-            if (answer === quizData[currentIndex].en) {
-                score++;
-                document.getElementById('score').innerText = score;
-                document.getElementById('msg').innerText = "✅ ត្រឹមត្រូវ! ពូកែណាស់!";
-                document.getElementById('msg').style.color = "green";
-                
-                // ទៅពាក្យបន្ទាប់ក្រោយ ១ វិនាទី
-                setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % quizData.length;
-                    loadQuiz();
-                }, 1000);
-            } else {
-                document.getElementById('msg').innerText = "❌ ខុសហើយ! ព្យាយាមម្ដងទៀត";
-                document.getElementById('msg').style.color = "red";
-            }
-        }
+    document.getElementById('userInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') check();
+    });
 
-        loadQuiz();
-    </script>
+    next();
+</script>
 </body>
 </html>
+
