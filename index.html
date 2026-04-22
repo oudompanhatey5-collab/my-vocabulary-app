@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App ភ្នំក្តីស្រមៃ - ៤ ភាសា</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #f4f7f6; }
+        body { font-family: 'Kantumruy Pro', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 30px; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1001; }
+        
+        /* ប្រអប់ស្វែងរក */
+        .search-container { background: #fff; padding: 10px; position: sticky; top: 65px; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #searchInput { width: 90%; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; display: block; margin: 0 auto; font-size: 16px; }
+
+        .tab-bar { display: flex; background: white; position: sticky; top: 125px; z-index: 999; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; font-weight: bold; cursor: pointer; font-size: 13px; color: #7f8c8d; }
+        .active-tab { border-bottom: 3px solid var(--accent); color: var(--accent); }
+        
+        .container { padding: 15px; }
+        .word-card { 
+            background: white; padding: 15px; border-radius: 12px; 
+            margin-bottom: 10px; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .word-info h4 { margin: 0; font-size: 18px; color: #34495e; }
+        .word-info p { margin: 5px 0 0; color: var(--accent); font-weight: bold; font-size: 13px; }
+        .voice-btn { background: var(--accent); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h3 style="margin:0;">ភ្នំក្តីស្រមៃ - ៤ ភាសា</h3>
+</header>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="🔍 ស្វែងរកពាក្យ..." onkeyup="searchWord()">
+</div>
+
+<div class="tab-bar">
+    <button class="tab-btn active-tab" onclick="changeLang('km', this)">ខ្មែរ 🇰🇭</button>
+    <button class="tab-btn" onclick="changeLang('en', this)">EN 🇬🇧</button>
+    <button class="tab-btn" onclick="changeLang('fr', this)">FR 🇫🇷</button>
+    <button class="tab-btn" onclick="changeLang('zh', this)">中 🇨🇳</button>
+</div>
+
+<div class="container" id="wordList"></div>
+
+<script>
+    // ទិន្នន័យ ៤០០ ពាក្យ (សង្ខេបគំរូ និងត្រៀមបញ្ចូលបន្ថែម)
+    const allWords = [
+        { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
+        { km: "អរគុណ", en: "Thanks", fr: "Merci", zh: "谢谢" },
+        { km: "មិត្ត", en: "Friend", fr: "Ami", zh: "朋友" },
+        { km: "ស្នេហា", en: "Love", fr: "Amour", zh: "爱情" },
+        { km: "គ្រួសារ", en: "Family", fr: "Famille", zh: "家庭" },
+        { km: "សាលា", en: "School", fr: "École", zh: "学校" },
+        { km: "គ្រូ", en: "Teacher", fr: "Professeur", zh: "老师" },
+        { km: "សិស្ស", en: "Student", fr: "Étudiant", zh: "学生" },
+        { km: "សៀវភៅ", en: "Book", fr: "Livre", zh: "书" },
+        { km: "ប៊ិច", en: "Pen", fr: "Stylo", zh: "笔" },
+        { km: "ទូរស័ព្ទ", en: "Phone", fr: "Téléphone", zh: "电话" },
+        { km: "កុំព្យូទ័រ", en: "Computer", fr: "Ordinateur", zh: "电脑" },
+        { km: "អ៊ីនធឺណិត", en: "Internet", fr: "Internet", zh: "互联网" },
+        { km: "រៀន", en: "Study", fr: "Étudier", zh: "学习" },
+        { km: "និយាយ", en: "Speak", fr: "Parler", zh: "说" }
+        // ចំណុចនេះ អ្នកអាចចម្លងពាក្យពី Excel មកដាក់បន្តបានយ៉ាងងាយ
+    ];
+
+    let currentLang = 'km';
+
+    function render(lang) {
+        currentLang = lang;
+        const container = document.getElementById('wordList');
+        container.innerHTML = "";
+        
+        allWords.forEach(item => {
+            let main = item[lang];
+            let sub = (lang === 'km') ? `${item.en} | ${item.zh}` : item.km;
+            let speechCode = (lang === 'en') ? 'en-US' : (lang === 'fr' ? 'fr-FR' : (lang === 'zh' ? 'zh-CN' : null));
+            
+            let btn = speechCode ? `<button class="voice-btn" onclick="say('${main}', '${speechCode}')">🔊</button>` : "";
+
+            container.innerHTML += `
+                <div class="word-card">
+                    <div class="word-info">
+                        <h4>${main}</h4>
+                        <p>${sub}</p>
+                    </div>
+                    ${btn}
+                </div>
+            `;
+        });
+    }
+
+    function say(text, lang) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = lang;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function searchWord() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let cards = document.getElementsByClassName('word-card');
+        
+        for (let i = 0; i < cards.length; i++) {
+            let text = cards[i].innerText.toLowerCase();
+            cards[i].style.display = text.includes(input) ? "" : "none";
+        }
+    }
+
+    function changeLang(lang, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+        btn.classList.add('active-tab');
+        render(lang);
+    }
+
+    render('km');
+</script>
+
+</body>
+</html>
