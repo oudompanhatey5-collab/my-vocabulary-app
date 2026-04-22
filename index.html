@@ -51,6 +51,16 @@
             }
         }, { once: true });
 
+        function say(text, lang) {
+        // បញ្ឈប់សំឡេងចាស់ដែលកំពុងនិយាយ
+        window.speechSynthesis.cancel();
+    
+        const msg = new SpeechSynthesisUtterance(text);
+         msg.lang = lang;
+         msg.rate = 0.8; // អានយឺតៗឱ្យងាយស្ដាប់
+         window.speechSynthesis.speak(msg);
+        }
+        
         // បញ្ជីពាក្យ (គ្មានកំហុស Error ទៀតទេ)
         const allWords = [
             { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
