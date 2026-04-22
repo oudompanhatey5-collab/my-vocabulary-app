@@ -8,16 +8,17 @@
         body { font-family: 'Khmer OS Siemreap', sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
         header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
         .search-container { padding: 10px; background: white; position: sticky; top: 50px; z-index: 999; }
-        #searchInput { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; }
+        #searchInput { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 16px; }
         .tab-bar { display: flex; background: white; position: sticky; top: 110px; z-index: 998; border-bottom: 2px solid #ddd; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; color: #666; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; color: #666; font-size: 14px; }
         .active-tab { border-bottom: 3px solid #ff7f50; color: #ff7f50; }
+        .developer-footer { text-align: center; margin-top: 10px; padding: 15px; color: #666; font-size: 14px; background-color: #f4f4f9; }
         .container { padding: 15px; padding-bottom: 30px; }
         .word-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .word-info h4 { margin: 0; font-size: 18px; color: #34495e; }
         .word-info p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; }
-        .voice-btn { background: #3498db; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 16px; }
-        .developer-footer { text-align: center; margin-top: 10px; padding: 15px; color: #666; font-size: 14px; background-color: #f4f4f9;}
+        .voice-btn { background: #3498db; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .voice-btn:active { background: #2980b9; transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -44,24 +45,7 @@
     <div class="container" id="wordList"></div>
 
     <script>
-        // ដោះសោសំឡេង (សម្រាប់ទូរស័ព្ទ)
-        document.addEventListener('click', function() {
-            if (window.speechSynthesis.state === 'suspended') {
-                window.speechSynthesis.resume();
-            }
-        }, { once: true });
-
-        function say(text, lang) {
-        // បញ្ឈប់សំឡេងចាស់ដែលកំពុងនិយាយ
-        window.speechSynthesis.cancel();
-    
-        const msg = new SpeechSynthesisUtterance(text);
-         msg.lang = lang;
-         msg.rate = 0.8; // អានយឺតៗឱ្យងាយស្ដាប់
-         window.speechSynthesis.speak(msg);
-        }
-        
-        // បញ្ជីពាក្យ (គ្មានកំហុស Error ទៀតទេ)
+        // បញ្ជីពាក្យ
         const allWords = [
             { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
             { km: "អរគុណ", en: "Thanks", fr: "Merci", zh: "谢谢" },
@@ -140,8 +124,13 @@
                 let main = item[lang];
                 let sub = (lang === 'km') ? `${item.en} | ${item.zh}` : item.km;
                 
-                let speechCode = (lang === 'en') ? 'en-US' : (lang === 'fr' ? 'fr-FR' : (lang === 'zh' ? 'zh-CN' : ''));
+                // កំណត់កូដភាសាសម្រាប់អានសំឡេង
+                let speechCode = "";
+                if (lang === 'en') speechCode = 'en-US';
+                else if (lang === 'fr') speechCode = 'fr-FR';
+                else if (lang === 'zh') speechCode = 'zh-CN';
                 
+                // បង្ហាញប៊ូតុងសំឡេងតែពេលមាន speechCode (ខ្មែរអត់មានសំឡេងទេ)
                 let btn = speechCode ? `<button class="voice-btn" onclick="say('${main}', '${speechCode}')">🔊</button>` : '';
 
                 container.innerHTML += `
@@ -156,9 +145,22 @@
             });
         }
 
-        function say(text, lang) {
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = lang;
+        // មុខងារអានសំឡេងដែលត្រូវបានកែសម្រួលថ្មីឱ្យត្រូវជាមួយទូរស័ព្ទ
+        function say(text, langCode) {
+            if (!window.speechSynthesis) {
+                alert("សុំទោស ទូរស័ព្ទរបស់អ្នកមិនមានមុខងារអានសំឡេងទេ។");
+                return;
+            }
+            
+            // បញ្ឈប់សំឡេងដែលកំពុងអានមុន
+            window.speechSynthesis.cancel();
+            
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = langCode;
+            msg.rate = 0.85; // បន្ថយល្បឿនបន្តិច
+            msg.pitch = 1;
+            
             window.speechSynthesis.speak(msg);
         }
 
