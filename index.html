@@ -48,6 +48,13 @@
 <div class="container" id="wordList"></div>
 
 <script>
+    // បន្ថែមនៅជួរទី ៥១ (ក្នុងឯកសារ index.html របស់អ្នក)
+document.addEventListener('click', function() {
+    if (window.speechSynthesis.state === 'suspended') {
+        window.speechSynthesis.resume();
+    }
+}, { once: false });
+    
     // ទិន្នន័យ ៤០០ ពាក្យ (សង្ខេបគំរូ និងត្រៀមបញ្ចូលបន្ថែម)
     const allWords = [
         { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
