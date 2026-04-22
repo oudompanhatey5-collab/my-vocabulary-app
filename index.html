@@ -3,185 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App ភ្នំក្តីស្រមៃ - ៤ ភាសា</title>
+    <title>App ភ្នំក្តីស្រមៃ</title>
     <style>
-        body { font-family: 'Khmer OS Siemreap', sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
-        header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
-        .search-container { padding: 10px; background: white; position: sticky; top: 50px; z-index: 999; }
-        #searchInput { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 16px; }
-        .tab-bar { display: flex; background: white; position: sticky; top: 110px; z-index: 998; border-bottom: 2px solid #ddd; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; color: #666; font-size: 14px; }
-        .active-tab { border-bottom: 3px solid #ff7f50; color: #ff7f50; }
-        .developer-footer { text-align: center; margin-top: 10px; padding: 15px; color: #666; font-size: 14px; background-color: #f4f4f9; }
-        .container { padding: 15px; padding-bottom: 30px; }
-        .word-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .word-info h4 { margin: 0; font-size: 18px; color: #34495e; }
-        .word-info p { margin: 5px 0 0; color: #7f8c8d; font-size: 14px; }
-        .voice-btn { background: #3498db; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .voice-btn:active { background: #2980b9; transform: scale(0.95); }
+        body { font-family: 'Khmer OS Siemreap', sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        header { background: #1a2a3a; color: white; padding: 20px; text-align: center; }
+        .search-box { padding: 10px; background: white; position: sticky; top: 0; z-index: 10; }
+        #searchInput { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; }
+        .tab { flex: 1; padding: 15px; border: none; background: none; font-weight: bold; cursor: pointer; color: #555; }
+        .active { border-bottom: 3px solid #007bff; color: #007bff; }
+        .container { padding: 15px; }
+        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h4 { margin: 0; color: #333; }
+        .card p { margin: 5px 0 0; color: #777; font-size: 14px; }
+        .speaker { background: #007bff; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+        .dev { text-align: center; padding: 10px; font-size: 12px; color: #888; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h3 style="margin:0;">ភ្នំក្តីស្រមៃ - ៤ ភាសា</h3>
-    </header>
+<header><h3>ភ្នំក្តីស្រមៃ - ៤ ភាសា</h3></header>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="ស្វែងរកពាក្យ..." onkeyup="searchWord()">
-    </div>
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="ស្វែងរកពាក្យ..." onkeyup="search()">
+</div>
 
-    <div class="tab-bar">
-        <button class="tab-btn active-tab" onclick="changeLang('km', this)">ខ្មែរ 🇰🇭</button>
-        <button class="tab-btn" onclick="changeLang('en', this)">EN 🇬🇧</button>
-        <button class="tab-btn" onclick="changeLang('fr', this)">FR 🇫🇷</button>
-        <button class="tab-btn" onclick="changeLang('zh', this)">中 🇨🇳</button>
-    </div>
-    
-    <div class="developer-footer">
-        បង្កើតដោយ៖ <strong>Tey OudomPanha</strong>
-    </div>
+<div class="tabs">
+    <button class="tab active" onclick="setLang('km', this)">KH 🇰🇭</button>
+    <button class="tab" onclick="setLang('en', this)">EN 🇬🇧</button>
+    <button class="tab" onclick="setLang('fr', this)">FR 🇫🇷</button>
+    <button class="tab" onclick="setLang('zh', this)">ZH 🇨🇳</button>
+</div>
 
-    <div class="container" id="wordList"></div>
+<div class="dev">បង្កើតដោយ៖ <strong>Tey OudomPanha</strong></div>
+<div class="container" id="list"></div>
 
-    <script>
-        // បញ្ជីពាក្យ
-        const allWords = [
-            { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
-            { km: "អរគុណ", en: "Thanks", fr: "Merci", zh: "谢谢" },
-            { km: "មិត្ត", en: "Friend", fr: "Ami", zh: "朋友" },
-            { km: "ស្រលាញ់", en: "Love", fr: "Amour", zh: "爱情" },
-            { km: "គ្រួសារ", en: "Family", fr: "Famille", zh: "家庭" },
-            { km: "សាលា", en: "School", fr: "École", zh: "学校" },
-            { km: "គ្រូ", en: "Teacher", fr: "Professeur", zh: "老师" },
-            { km: "សិស្ស", en: "Student", fr: "Étudiant", zh: "学生" },
-            { km: "សៀវភៅ", en: "Book", fr: "Livre", zh: "书" },
-            { km: "ប៊ិច", en: "Pen", fr: "Stylo", zh: "笔" },
-            { km: "ទូរស័ព្ទ", en: "Phone", fr: "Téléphone", zh: "电话" },
-            { km: "កុំព្យូទ័រ", en: "Computer", fr: "Ordinateur", zh: "电脑" },
-            { km: "អ៊ីនធឺណិត", en: "Internet", fr: "Internet", zh: "互联网" },
-            { km: "រៀន", en: "Study", fr: "Étudier", zh: "学习" },
-            { km: "និយាយ", en: "Speak", fr: "Parler", zh: "说" },
-            { km: "ពន្លឺ", en: "Light", fr: "Lumière", zh: "阳光" },
-            { km: "ទន្លេ", en: "River", fr: "Rivière", zh: "河流" },
-            { km: "មេឃ", en: "Sky", fr: "Ciel", zh: "天空" },
-            { km: "ផ្កាយ", en: "Star", fr: "Étoile", zh: "星星" },
-            { km: "សួនច្បារ", en: "Garden", fr: "Jardin", zh: "花园" },
-            { km: "បណ្ណាល័យ", en: "Library", fr: "Bibliothèque", zh: "图书馆" },
-            { km: "តុ", en: "Table", fr: "Tableau", zh: "桌子" },
-            { km: "បង្អួច", en: "Window", fr: "Fenêtre", zh: "窗户" },
-            { km: "ទ្វារ", en: "Door", fr: "Porte", zh: "门" },
-            { km: "កៅអី", en: "Chair", fr: "Chaise", zh: "椅子" },
-            { km: "ប្រឡង", en: "Exam", fr: "Examen", zh: "考试" },
-            { km: "ការងារ", en: "Work", fr: "Travail", zh: "工作" },
-            { km: "គំនិត", en: "Idea", fr: "Idée", zh: "想法" },
-            { km: "ក្តីស្រមៃ", en: "Dream", fr: "Rêve", zh: "梦想" },
-            { km: "អនាគត", en: "Future", fr: "Avenir", zh: "未来" },
-            { km: "ជោគជ័យ", en: "Success", fr: "Succès", zh: "成功" },
-            { km: "កម្លាំង", en: "Strength", fr: "Force", zh: "力量" },
-            { km: "ផ្ទះបាយ", en: "Kitchen", fr: "Cuisine", zh: "厨房" },
-            { km: "បន្ទប់ទឹក", en: "Toilet", fr: "Toilettes", zh: "厕所" },
-            { km: "អំពូល", en: "Bulb", fr: "Ampoule", zh: "灯泡" },
-            { km: "កង្ហារ", en: "Fan", fr: "Ventilateur", zh: "风扇" },
-            { km: "ម៉ាស៊ីនត្រជាក់", en: "AC", fr: "Climatisation", zh: "空调" },
-            { km: "រថយន្ត", en: "Car", fr: "Voiture", zh: "汽车" },
-            { km: "ម៉ូតូ", en: "Motorbike", fr: "Moto", zh: "摩托车" },
-            { km: "កង់", en: "Bicycle", fr: "Vélo", zh: "自行车" },
-            { km: "យន្តហោះ", en: "Airplane", fr: "Avion", zh: "飞机" },
-            { km: "នាវា", en: "Ship", fr: "Navire", zh: "船" },
-            { km: "សំបុត្រ", en: "Ticket", fr: "Billet", zh: "票" },
-            { km: "ដំណើរ", en: "Journey", fr: "Voyage", zh: "旅行" },
-            { km: "ថ្ងៃឈប់សម្រាក", en: "Holiday", fr: "Vacances", zh: "假期" },
-            { km: "ពិធីបុណ្យ", en: "Festival", fr: "Festival", zh: "节日" },
-            { km: "អំណោយ", en: "Gift", fr: "Cadeau", zh: "礼物" },
-            { km: "ការភ្ញាក់ផ្អើល", en: "Surprise", fr: "Surprise", zh: "惊喜" },
-            { km: "ភាពក្លាហាន", en: "Courage", fr: "Courage", zh: "勇气" },
-            { km: "ការទទួលខុសត្រូវ", en: "Responsibility", fr: "Responsabilité", zh: "责任" },
-            { km: "ភាពអត់ធ្មត់", en: "Patience", fr: "Patience", zh: "耐心" },
-            { km: "ការចងចាំ", en: "Memory", fr: "Mémoire", zh: "记忆" },
-            { km: "ភាពច្នៃប្រឌិត", en: "Creativity", fr: "Créativité", zh: "创意" },
-            { km: "ការអប់រំ", en: "Education", fr: "Éducation", zh: "教育" },
-            { km: "វិទ្យាសាស្ត្រ", en: "Science", fr: "Science", zh: "科学" },
-            { km: "គណិតវិទ្យា", en: "Math", fr: "Maths", zh: "数学" },
-            { km: "បច្ចេកវិទ្យា", en: "Tech", fr: "Technologie", zh: "技术" },
-            { km: "សិល្បៈ", en: "Art", fr: "Art", zh: "艺术" },
-            { km: "គំនូរ", en: "Drawing", fr: "Dessin", zh: "画" },
-            { km: "ពណ៌", en: "Color", fr: "Couleur", zh: "颜色" },
-            { km: "ក្លិន", en: "Smell", fr: "Odeur", zh: "味道" },
-            { km: "រសជាតិ", en: "Taste", fr: "Goût", zh: "口味" },
-            { km: "អារម្មណ៍", en: "Feeling", fr: "Sentiment", zh: "情绪" },
-            { km: "ជីវិត", en: "Life", fr: "Vie", zh: "生活" }
-        ];
+<script>
+    const words = [
+        { km: "សួស្តី", en: "Hello", fr: "Bonjour", zh: "你好" },
+        { km: "អរគុណ", en: "Thank you", fr: "Merci", zh: "谢谢" },
+        { km: "មិត្តភក្តិ", en: "Friend", fr: "Ami", zh: "朋友" },
+        { km: "ស្រលាញ់", en: "Love", fr: "Amour", zh: "爱" },
+        { km: "សាលារៀន", en: "School", fr: "École", zh: "学校" },
+        { km: "គ្រូ", en: "Teacher", fr: "Professeur", zh: "老师" },
+        { km: "សៀវភៅ", en: "Book", fr: "Livre", zh: "书" },
+        { km: "ជោគជ័យ", en: "Success", fr: "Succès", zh: "成功" }
+    ];
 
-        let currentLang = 'km';
+    let current = 'km';
 
-        function render(lang) {
-            currentLang = lang;
-            const container = document.getElementById('wordList');
-            container.innerHTML = "";
-
-            allWords.forEach(item => {
-                let main = item[lang];
-                let sub = (lang === 'km') ? `${item.en} | ${item.zh}` : item.km;
-                
-                // កំណត់កូដភាសាសម្រាប់អានសំឡេង
-                let speechCode = "";
-                if (lang === 'en') speechCode = 'en-US';
-                else if (lang === 'fr') speechCode = 'fr-FR';
-                else if (lang === 'zh') speechCode = 'zh-CN';
-                
-                // បង្ហាញប៊ូតុងសំឡេងតែពេលមាន speechCode (ខ្មែរអត់មានសំឡេងទេ)
-                let btn = speechCode ? `<button class="voice-btn" onclick="say('${main}', '${speechCode}')">🔊</button>` : '';
-
-                container.innerHTML += `
-                    <div class="word-card">
-                        <div class="word-info">
-                            <h4>${main}</h4>
-                            <p>${sub}</p>
-                        </div>
-                        ${btn}
-                    </div>
-                `;
-            });
+    // មុខងារដាស់សំឡេងទូរស័ព្ទ (Unlock Audio)
+    document.addEventListener('click', function() {
+        if (window.speechSynthesis.state === 'suspended') {
+            window.speechSynthesis.resume();
         }
+    }, { once: false });
 
-        // មុខងារអានសំឡេងដែលត្រូវបានកែសម្រួលថ្មីឱ្យត្រូវជាមួយទូរស័ព្ទ
-        function say(text, langCode) {
-            if (!window.speechSynthesis) {
-                alert("សុំទោស ទូរស័ព្ទរបស់អ្នកមិនមានមុខងារអានសំឡេងទេ។");
-                return;
-            }
+    function render() {
+        const list = document.getElementById('list');
+        list.innerHTML = "";
+        words.forEach(w => {
+            let main = w[current];
+            let sub = (current === 'km') ? w.en : w.km;
+            let langCode = (current === 'en') ? 'en-US' : (current === 'fr' ? 'fr-FR' : (current === 'zh' ? 'zh-CN' : ''));
             
-            // បញ្ឈប់សំឡេងដែលកំពុងអានមុន
-            window.speechSynthesis.cancel();
+            let btn = langCode ? `<button class="speaker" onclick="speak('${main}', '${langCode}')">🔊</button>` : '';
             
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = text;
-            msg.lang = langCode;
-            msg.rate = 0.85; // បន្ថយល្បឿនបន្តិច
-            msg.pitch = 1;
-            
-            window.speechSynthesis.speak(msg);
-        }
+            list.innerHTML += `
+                <div class="card">
+                    <div><h4>${main}</h4><p>${sub}</p></div>
+                    ${btn}
+                </div>`;
+        });
+    }
 
-        function searchWord() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.getElementsByClassName('word-card');
+    function speak(txt, lang) {
+        window.speechSynthesis.cancel();
+        let ut = new SpeechSynthesisUtterance(txt);
+        ut.lang = lang;
+        ut.rate = 0.8;
+        window.speechSynthesis.speak(ut);
+    }
 
-            for (let i = 0; i < cards.length; i++) {
-                let text = cards[i].innerText.toLowerCase();
-                cards[i].style.display = text.includes(input) ? "" : "none";
-            }
-        }
+    function setLang(l, b) {
+        current = l;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        b.classList.add('active');
+        render();
+    }
 
-        function changeLang(lang, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-            btn.classList.add('active-tab');
-            render(lang);
-        }
+    function search() {
+        let query = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(query) ? "" : "none";
+        });
+    }
 
-        // ដំណើរការកម្មវិធីដំបូង
-        render('km');
-    </script>
+    render();
+</script>
 </body>
 </html>
